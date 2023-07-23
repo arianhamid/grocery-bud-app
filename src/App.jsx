@@ -1,41 +1,97 @@
-import React, { useState, useEffect } from "react";
-import List from "./List";
+import React, { useState, useEffect, useRef } from "react";
+import Lists from "./List";
 import Alert from "./Alert";
 
 function App() {
-  const [value, setValue] = useState("");
-  const [buds, setBuds] = useState([]);
+  const [name, setName] = useState("");
+  const [list, setList] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+
+  const inputRef = useRef(null);
+
   const onSubmit = (e) => {
     e.preventDefault();
-    setBuds([...buds, value]);
+    setList([...list, name]);
+    setName("");
   };
   const onDelete = (delIndex) => {
-    console.log(delIndex);
-    const newBuds = buds.filter((bud, index) => {
-      return index !== delIndex;
+    const newList = list.filter((item, index) => {
+      console.log(index);
+      console.log(delIndex);
+      return index != delIndex;
     });
-    setBuds(newBuds);
+    setList(newList);
   };
+
+  const editHandler = (editIndex) => {
+    setIsEditing(true);
+    setEditIndex(editIndex);
+    setName(list[editIndex]);
+  };
+  const saveEdit = () => {
+    const newEditedList = [...list];
+    newEditedList[editIndex] = name;
+    setList(newEditedList);
+    setName("");
+    setIsEditing(false);
+  };
+
   return (
     <section className="section-center">
       <form onSubmit={onSubmit}>
         <h4>Grocery Bud</h4>
-        <div className="form-control">
-          <input
-            type="text "
-            className="form-input"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-          <button type="submit" className="btn">
-            add item
-          </button>
-        </div>
+        {isEditing ? (
+          <div className="form-control">
+            <input
+              autoFocus
+              ref={inputRef}
+              type="text "
+              className="form-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                saveEdit();
+              }}
+            >
+              save
+            </button>
+          </div>
+        ) : (
+          <div className="form-control">
+            <input
+              autoFocus
+              ref={inputRef}
+              type="text "
+              className="form-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="btn"
+              onClick={() => inputRef.current.focus()}
+            >
+              add item
+            </button>
+          </div>
+        )}
       </form>
       <div className="items">
-        {buds.map((bud, index) => {
+        {list.map((bud, index) => {
           return (
-            <List key={index} bud={bud} onDelete={onDelete} index={index} />
+            <Lists
+              key={index}
+              bud={bud}
+              onDelete={onDelete}
+              index={index}
+              editHandler={editHandler}
+              inputRef={inputRef}
+            />
           );
         })}
       </div>

@@ -1,7 +1,6 @@
 import React from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-const List = ({ bud, index, onDelete }) => {
-  console.log(onDelete)
+const List = ({ bud, index, onDelete, inputRef, editHandler }) => {
   return (
     <div className="single-item">
       <input type="checkbox" />
@@ -12,6 +11,16 @@ const List = ({ bud, index, onDelete }) => {
         onClick={() => onDelete(index)}
       >
         delete
+      </button>
+      <button
+        className="btn remove-btn"
+        type="button"
+        onClick={() => {
+          inputRef.current.focus();
+          editHandler(index);
+        }}
+      >
+        Edit
       </button>
     </div>
   );
