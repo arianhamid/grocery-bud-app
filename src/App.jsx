@@ -6,43 +6,65 @@ function App() {
   const [name, setName] = useState("");
   const [list, setList] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editIndex, setEditIndex] = useState(null);
-  const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
+  const [editId, setEditId] = useState(null);
+  const [alert, setAlert] = useState({
+    show: false,
+    msg: "",
+    type: "",
+  });
 
   const inputRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name) {
+      showAlert(true, "Plese Provide Value", "danger");
     } else if (name && isEditing) {
-      const newEditedList = [...list];
-      newEditedList[editIndex].title = name;
-      setList(newEditedList);
+      setList(
+        list.map((item) => {
+          if (item.id === editId) {
+            return { ...item, title: name };
+          }
+          return item;
+        })
+      );
       setName("");
       setIsEditing(false);
+      setEditId(null);
+      showAlert(true, "Item Edited", "success");
     } else {
       setList([...list, { id: new Date().getTime().toString(), title: name }]);
       setName("");
+      setAlert({ show: true, msg: "Item Added To The List", type: "success" });
     }
   };
-  const onDelete = (id) => {
+  const showAlert = (show = false, msg = "", type = "") => {
+    setAlert({ show, msg, type });
+  };
+  const removeItem = (id) => {
     const newList = list.filter((item) => {
-      return item.id != id;
+      return item.id !== id;
     });
     setList(newList);
+    showAlert(true, "Item Removed", "danger");
   };
 
-  const editHandler = (editIndex) => {
-    console.log(editIndex);
+  const editHandler = (id) => {
+    const specificItem = list.find((item) => item.id === id);
+    setName(specificItem.title);
     setIsEditing(true);
-    setEditIndex(editIndex);
-    setName(list[editIndex].title);
-    handleSubmit();
+    setEditId(id);
+  };
+
+  const clearItems = () => {
+    showAlert(true, "You Deleted Items", "danger");
+    setList([]);
   };
 
   return (
     <section className="section-center">
       <form onSubmit={handleSubmit}>
+        {alert.show && <Alert {...alert} removeAlert={showAlert} list={list} />}
         <h4>Grocery Bud</h4>
         <div className="form-control">
           <input
@@ -67,13 +89,15 @@ function App() {
                 index={index}
                 key={index}
                 {...item}
-                onDelete={onDelete}
+                removeItem={removeItem}
                 editHandler={editHandler}
                 inputRef={inputRef}
               />
             );
           })}
-          <button className="clear-btn">Clear Items</button>
+          <button className="clear-btn" onClick={clearItems}>
+            Clear Items
+          </button>
         </div>
       )}
     </section>
