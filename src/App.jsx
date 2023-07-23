@@ -7,94 +7,75 @@ function App() {
   const [list, setList] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
 
   const inputRef = useRef(null);
 
-  const onSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setList([...list, name]);
-    setName("");
+    if (!name) {
+    } else if (name && isEditing) {
+      const newEditedList = [...list];
+      newEditedList[editIndex].title = name;
+      setList(newEditedList);
+      setName("");
+      setIsEditing(false);
+    } else {
+      setList([...list, { id: new Date().getTime().toString(), title: name }]);
+      setName("");
+    }
   };
-  const onDelete = (delIndex) => {
-    const newList = list.filter((item, index) => {
-      console.log(index);
-      console.log(delIndex);
-      return index != delIndex;
+  const onDelete = (id) => {
+    const newList = list.filter((item) => {
+      return item.id != id;
     });
     setList(newList);
   };
 
   const editHandler = (editIndex) => {
+    console.log(editIndex);
     setIsEditing(true);
     setEditIndex(editIndex);
-    setName(list[editIndex]);
-  };
-  const saveEdit = () => {
-    const newEditedList = [...list];
-    newEditedList[editIndex] = name;
-    setList(newEditedList);
-    setName("");
-    setIsEditing(false);
+    setName(list[editIndex].title);
+    handleSubmit();
   };
 
   return (
     <section className="section-center">
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit}>
         <h4>Grocery Bud</h4>
-        {isEditing ? (
-          <div className="form-control">
-            <input
-              autoFocus
-              ref={inputRef}
-              type="text "
-              className="form-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <button
-              type="button"
-              className="btn"
-              onClick={() => {
-                saveEdit();
-              }}
-            >
-              save
-            </button>
-          </div>
-        ) : (
-          <div className="form-control">
-            <input
-              autoFocus
-              ref={inputRef}
-              type="text "
-              className="form-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="btn"
-              onClick={() => inputRef.current.focus()}
-            >
-              add item
-            </button>
-          </div>
-        )}
+        <div className="form-control">
+          <input
+            autoFocus
+            ref={inputRef}
+            type="text "
+            className="form-input"
+            placeholder="e.g. eggs"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button type="submit" className="btn">
+            {isEditing ? "edit" : "add"}
+          </button>
+        </div>
       </form>
-      <div className="items">
-        {list.map((bud, index) => {
-          return (
-            <Lists
-              key={index}
-              bud={bud}
-              onDelete={onDelete}
-              index={index}
-              editHandler={editHandler}
-              inputRef={inputRef}
-            />
-          );
-        })}
-      </div>
+      {list.length > 0 && (
+        <div className="items">
+          {list.map((item, index) => {
+            return (
+              <Lists
+                index={index}
+                key={index}
+                {...item}
+                onDelete={onDelete}
+                editHandler={editHandler}
+                inputRef={inputRef}
+              />
+            );
+          })}
+          <button className="clear-btn">Clear Items</button>
+        </div>
+      )}
     </section>
   );
 }

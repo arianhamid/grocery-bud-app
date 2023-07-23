@@ -1,26 +1,22 @@
 import React from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-const List = ({ bud, index, onDelete, inputRef, editHandler }) => {
+const List = ({ title, id, onDelete, inputRef, editHandler, index }) => {
   return (
     <div className="single-item">
       <input type="checkbox" />
-      <p style={{ textTransform: "capitalize" }}>{bud}</p>
+      <p style={{ textTransform: "capitalize" }}>{title}</p>
       <button
-        className="btn remove-btn"
-        type="button"
-        onClick={() => onDelete(index)}
-      >
-        delete
-      </button>
-      <button
-        className="btn remove-btn"
+        className="edit-btn"
         type="button"
         onClick={() => {
           inputRef.current.focus();
           editHandler(index);
         }}
       >
-        Edit
+        <FaEdit />
+      </button>
+      <button className="delete-btn" type="button" onClick={() => onDelete(id)}>
+        <FaTrash />
       </button>
     </div>
   );
