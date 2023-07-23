@@ -7,14 +7,26 @@ function App() {
   const [buds, setBuds] = useState([]);
   const onSubmit = (e) => {
     e.preventDefault();
-    setBuds([...buds,value])
+    setBuds([...buds, value]);
+  };
+  const onDelete = (delIndex) => {
+    console.log(delIndex);
+    const newBuds = buds.filter((bud, index) => {
+      return index !== delIndex;
+    });
+    setBuds(newBuds);
   };
   return (
     <section className="section-center">
       <form onSubmit={onSubmit}>
         <h4>Grocery Bud</h4>
         <div className="form-control">
-          <input type="text " className="form-input" value={value} onChange={(e)=>setValue(e.target.value)}/>
+          <input
+            type="text "
+            className="form-input"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
           <button type="submit" className="btn">
             add item
           </button>
@@ -22,7 +34,9 @@ function App() {
       </form>
       <div className="items">
         {buds.map((bud, index) => {
-          return <List key={index} bud={bud} />;
+          return (
+            <List key={index} bud={bud} onDelete={onDelete} index={index} />
+          );
         })}
       </div>
     </section>
